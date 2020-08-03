@@ -103,14 +103,6 @@ app.put('/v1/ptys/:guid/close', async (req, res) => {
   res.json({status: 'success'});
 });
 
-app.use((err, req, res) => {
-  res.status(err.status || 400);
-  res.json({
-    status: 'error',
-    msg: err.message,
-  });
-});
-
 const svr = http.createServer(app);
 const wb = new WebSocket.Server({server: svr, path: '/ws'});
 
@@ -160,6 +152,6 @@ hgetallAsync('channels').then((d) => {
 });
 */
 
-svr.listen('4201', '127.0.0.1', () => {
-  console.log('listening on port 4201 ...');
+svr.listen(config.PORT, '127.0.0.1', () => {
+  console.log('listening ...');
 });

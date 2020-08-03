@@ -2,6 +2,8 @@ const _ = require('lodash');
 
 let config = {};
 
+config.PORT = process.env.PORT;
+
 // db
 config.DB_OPTS = {
   user: process.env.PGUSER || 'test',
