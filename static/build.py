@@ -31,7 +31,6 @@ def concat_css():
     fnames = [
         '../node_modules/bootstrap/dist/css/bootstrap.min.css',
         '../node_modules/xterm/dist/xterm.css',
-        './src/fonts/fontawesome-free-5.7.0-web/css/all.min.css',
         './src/css/custom.css',
     ]
     dest = './dist/css/main.css'
@@ -48,7 +47,6 @@ def concat_js():
         '../node_modules/vue/dist/vue.min.js',
         '../node_modules/xterm/dist/xterm.js',
         '../node_modules/xterm/dist/addons/fit/fit.js',
-        './src/fonts/fontawesome-free-5.7.0-web/js/all.min.js',
         './src/js/reconnecting-websocket.min.js',
         './src/js/bootstrap-notify.min.js',
     ]
@@ -92,7 +90,7 @@ def build():
     concat_js()
     create_dirs()
     # copy_images()
-    copy_fa_fonts()
+    # copy_fa_fonts()
     # copy_favicon()
     # copy_login()
     copy_app()
