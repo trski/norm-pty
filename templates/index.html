@@ -1,0 +1,54 @@
+<% include header.html %>
+<style>
+  .hide-x {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+  }
+  .hide-event {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+  }
+  .active {
+    border-left: 2px solid green;
+  }
+  .clear {
+    border-left: none;
+  }
+  .pty-active {
+    color: green;
+  }
+  .stopping {
+    border-left: 5px solid red;
+  }
+  .pty-not-active {
+    color: gray;
+  }
+  .xterm-viewport { overflow: auto !important; }
+</style>
+<div id="pty" v-cloak>
+  <div class="row">
+    <div class="col-12 mt-4">
+      <div id="terminal"></div>
+    </div>
+  </div>
+  <!--
+  <div class="row">
+    <div class="col-12 mb-5">
+      <div style="float-right">
+        <span v-bind:class="{'pty-active': pty, 'pty-not-active': !pty}">
+          <i class="fas fa-chevron-circle-right"></i>
+        </span>
+        [[ pty ? ('Connected to pty: ' + pty) : 'Disconnected' ]]
+      </div>
+    </div>
+  </div>
+  -->
+</div>
+<script>
+  let GUID = '<%= guid %>';
+</script>
+<script>createPtyView()</script>
+<% include footer.html %>

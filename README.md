@@ -1,1 +1,1 @@
-# norm-pty
+# pty
