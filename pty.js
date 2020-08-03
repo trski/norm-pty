@@ -3,6 +3,18 @@ const pty = require('node-pty');
 const redis = require('redis');
 const promisify = require('util').promisify;
 const utils = require('./lib/utils');
+const config = require('./config');
+
+const redisOpts = {
+  port: config.REDIS.PORT,
+  host: config.REDIS.HOST
+};
+if (config.REDIS.PASS) {
+  redisOpts.password = config.REDIS.PASS;
+}
+if (config.REDIS.TLS) {
+  redisOpts.tls = config.REDIS.TLS;
+}
 
 const to = utils.to;
 const ptys = {};
@@ -19,7 +31,7 @@ const ptyFactory = (opts) => {
   return p;
 };
 
-const rd = redis.createClient();
+const rd = redis.createClient(redisOpts);
 const setAsync = promisify(rd.set).bind(rd);
 
 const register = async (guid) => {
@@ -40,7 +52,7 @@ const register = async (guid) => {
   return err;
 };
 
-const broadcast = redis.createClient();
+const broadcast = redis.createClient(redisOpts);
 broadcast.subscribe('broadcast');
 broadcast.on('message', async (chan, d) => {
   let err = null;
@@ -80,7 +92,7 @@ broadcast.on('message', async (chan, d) => {
     }
     let p = ptyFactory({ guid });
     ptys[guid] = p;
-    let sub = redis.createClient();
+    let sub = redis.createClient(redisOpts);
     sub.subscribe(`to-pty:${guid}`);
     sub.on('message', (chan, msg) => {
       p.write(msg);

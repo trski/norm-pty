@@ -8,10 +8,21 @@ const WebSocket = require('ws');
 const uuid = require('uuid');
 const promisify = require('util').promisify;
 const utils = require('./lib/utils');
+const config = require('./config');
 
 const app = express();
 const to = utils.to;
-const rd = redis.createClient();
+let redisOpts = {
+  port: config.REDIS.PORT,
+  host: config.REDIS.HOST
+};
+if (config.REDIS.PASS) {
+  redisOpts.password = config.REDIS.PASS;
+}
+if (config.REDIS.TLS) {
+  redisOpts.tls = config.REDIS.TLS;
+}
+const rd = redis.createClient(redisOpts);
 // const getAsync = promisify(rd.get).bind(rd);
 // const hgetAsync = promisify(rd.hget).bind(rd);
 const hgetallAsync = promisify(rd.hgetall).bind(rd);
@@ -57,7 +68,7 @@ app.post('/v1/ptys', async (req, res, next) => {
     guid,
     msg: 'open'
   };
-  let sub = redis.createClient();
+  let sub = redis.createClient(redisOpts);
   sub.subscribe(`from-pty:${guid}`);
   sub.on('message', (chan, msg) => {
     let d = clients[guid];
@@ -90,6 +101,14 @@ app.put('/v1/ptys/:guid/close', async (req, res) => {
   };
   rd.publish('broadcast', JSON.stringify(d));
   res.json({status: 'success'});
+});
+
+app.use((err, req, res) => {
+  res.status(err.status || 400);
+  res.json({
+    status: 'error',
+    msg: err.message,
+  });
 });
 
 const svr = http.createServer(app);
