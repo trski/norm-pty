@@ -151,14 +151,13 @@ hgetallAsync('channels').then((d) => {
 
 const reap = () => {
   _.each(clients, (v, k) => {
-    let w = clients[k];
-    _.each(w, (client) => {
-      if (w === null) {
+    _.each(v, (ws) => {
+      if (ws === null) {
         return true;
       }
-      if (w.isAlive === false) {
-        w.terminate();
-        w = null;
+      if (ws.isAlive === false) {
+        ws.terminate();
+        ws = null;
         return true;
       } else {
         ws.isAlive = false;
