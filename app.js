@@ -164,7 +164,7 @@ const reap = () => {
         ws.ping(() => {});
       }
     });
-    clients[k] = _.filter(d, (v) => { return v !== null });
+    clients[k] = _.filter(v, (ws) => { return ws !== null });
   });
   setTimeout(reap, 10000);
 };
