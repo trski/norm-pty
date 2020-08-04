@@ -19,7 +19,7 @@
     "xterm-addon-fit": "^0.4.0"
   },
   "devDependencies": {
-    "eslint": "^7.5.0",
+    "eslint": "^7.6.0",
     "eslint-plugin-vue": "^6.2.2"
   }
 }

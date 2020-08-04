@@ -100,19 +100,21 @@ app.put('/v1/ptys/:guid/close', async (req, res) => {
   res.json({status: 'success'});
 });
 
+function noop() {}
+
+function heartbeat() {
+  this.isAlive = true;
+}
+
 const svr = http.createServer(app);
 const wb = new WebSocket.Server({server: svr, path: '/ws'});
 
 wb.on('connection', async (ws, req) => {
+  ws.isAlive = true;
+  ws.on('pong', heartbeat);
   let q = urlParser.parse(req.url, true).query;
   let guid = q.guid;
   console.log(guid);
-  /*
-  if (!chans[guid]) {
-    console.log('bad guid');
-    return null;
-  }
-  */
   let d = clients[guid] || [];
   d.push(ws);
   clients[guid] = d;
@@ -126,50 +128,17 @@ wb.on('connection', async (ws, req) => {
   });
 });
 
-/*
-const pollAgents = () => {
-  setTimeout(() => {
-    hgetallAsync('agents').then((d) => {
-      agents = d;
-    }).catch((err) => {
-      console.error(err);
-    });
-  }, 5000);
-};
-pollAgents();
-hgetallAsync('channels').then((d) => {
-  _.each(Object.keys(d), (v, k) => {
-    let chan = redis.createClient();
-    chan.subscribe(k);
-    chans[k] = chan;
+const interval = setInterval(function ping() {
+  wb.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+    ws.isAlive = false;
+    ws.ping(noop);
   });
-}).catch((err) => {
-  console.error('cannot get channels');
-  process.exit(1);
+}, 10000);
+
+wb.on('close', function close() {
+  clearInterval(interval);
 });
-*/
-
-const reap = () => {
-  _.each(clients, (v, k) => {
-    _.each(v, (ws) => {
-      if (ws === null) {
-        return true;
-      }
-      if (ws.isAlive === false) {
-        ws.terminate();
-        ws = null;
-        return true;
-      } else {
-        ws.isAlive = false;
-        ws.ping(() => {});
-      }
-    });
-    clients[k] = _.filter(v, (ws) => { return ws !== null });
-  });
-  setTimeout(reap, 10000);
-};
-
-reap();
 
 svr.listen(config.PORT, '127.0.0.1', () => {
   console.log('listening ...');
