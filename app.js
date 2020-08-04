@@ -82,11 +82,8 @@ app.post('/v1/ptys', async (req, res, next) => {
       }
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(msg);
-      } else { // TODO: reap the dead websockets
-        ws = null;
       }
     });
-    clients[guid] = _.filter(d, (v) => { return v !== null });
   });
   subs[guid] = sub;
   rd.publish('broadcast', JSON.stringify(d));
@@ -151,6 +148,29 @@ hgetallAsync('channels').then((d) => {
   process.exit(1);
 });
 */
+
+const reap = () => {
+  _.each(clients, (v, k) => {
+    let w = clients[k];
+    _.each(w, (client) => {
+      if (w === null) {
+        return true;
+      }
+      if (w.isAlive === false) {
+        w.terminate();
+        w = null;
+        return true;
+      } else {
+        ws.isAlive = false;
+        ws.ping(() => {});
+      }
+    });
+    clients[k] = _.filter(d, (v) => { return v !== null });
+  });
+  setTimeout(reap, 10000);
+};
+
+reap();
 
 svr.listen(config.PORT, '127.0.0.1', () => {
   console.log('listening ...');
