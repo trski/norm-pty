@@ -45,4 +45,6 @@ config.REDIS_URL = (() => {
   return d;
 })();
 
+config.TOKEN = process.env.TOKEN || 'norm';
+
 module.exports = config;
