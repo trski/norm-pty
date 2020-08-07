@@ -56,6 +56,10 @@ app.get('/v1/ptys', async (req, res, next) => {
 });
 
 app.post('/v1/ptys', async (req, res, next) => {
+  let token = req.query.token;
+  if (token !== config.TOKEN) {
+    return next(new Error('bad token'));
+  }
   let opts = req.body;
   if (!opts) {
     return next(new Error('bad json'));
