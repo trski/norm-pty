@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const pty = require('node-pty');
 const redis = require('redis');
+const os = require('os');
 const promisify = require('util').promisify;
 const utils = require('./lib/utils');
 const config = require('./config');
@@ -20,6 +21,26 @@ const to = utils.to;
 const ptys = {};
 const subs = {};
 
+const getIP = () => {
+  let nets = os.networkInterfaces();
+  let res = {};
+  for (let name of Object.keys(nets)) {
+    for (let net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        if (!res[name]) {
+          res[name] = [];
+        }
+        res[name].push(net.address);
+      }
+    }
+  }
+  let host = res['eth0'] ? res['eth0'][0] : null;
+  return host;
+};
+
+const NORM_PTY_HOST = process.env.NORM_PTY_HOST || getIP();
+console.log('registering host: ' + NORM_PTY_HOST);
+
 const ptyFactory = (opts) => {
   let p = pty.spawn('bash', [], {
     name: 'xterm-color',
@@ -36,7 +57,7 @@ const setAsync = promisify(rd.set).bind(rd);
 
 const register = async (guid) => {
   let updated = new Date();
-  let host = 'localhost';
+  let host = NORM_PTY_HOST;
   let payload = {
     updated
   };
