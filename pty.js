@@ -88,6 +88,9 @@ broadcast.on('message', async (chan, d) => {
     return err;
   }
   // TODO: check for the host
+  if (d.host !== NORM_PTY_HOST) {
+    return null;
+  }
   if (d.msg === 'close') {
     let guid = d.guid;
     let p = ptys[guid];
