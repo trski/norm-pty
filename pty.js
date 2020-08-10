@@ -38,7 +38,7 @@ const getIP = () => {
   return host;
 };
 
-const NORM_PTY_HOST = process.env.NORM_PTY_HOST || getIP();
+const NORM_PTY_HOST = process.env.NORM_PTY_HOST || getIP() || os.hostname();
 console.log('registering host: ' + NORM_PTY_HOST);
 
 const ptyFactory = (opts) => {
