@@ -153,8 +153,10 @@ const reap = () => {
         return null;
       }
       if (p.date) {
-        let delta = Math.abs(d - p.date);
-        if (delta > (25 * 60 * 1000)) {
+        let delta = (d.getTime() - p.date.getTime()) / 1000;
+        delta /= 60;
+        let m = Math.abs(Math.round(delta));
+        if (m > 25) {
           p.kill();
           p = null;
           delete ptys[k];
@@ -165,10 +167,10 @@ const reap = () => {
         p.date = d;
       }
     });
-  }, 5000);
+  }, 10000);
 };
 
-// poll();
+poll();
 reap();
 
 console.log('starting ...');
