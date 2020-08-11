@@ -55,14 +55,14 @@ const ptyFactory = (opts) => {
 const rd = redis.createClient(redisOpts);
 const setAsync = promisify(rd.set).bind(rd);
 
-const register = async (guid) => {
+const register = async () => {
   let updated = new Date();
   let host = NORM_PTY_HOST;
   let payload = {
     updated
   };
   let [err] = await to(setAsync(
-    `agents:${host}:ptys:${guid}`,
+    `agents:${host}`,
     JSON.stringify(payload),
     'EX',
     10
@@ -137,9 +137,7 @@ broadcast.on('message', async (chan, d) => {
 
 const poll = () => {
   setTimeout(async () => {
-    await _.each(Object.keys(ptys), async (k) => {
-      await register(k);
-    });
+    await register();
     return poll();
   }, 5000);
 };
