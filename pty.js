@@ -139,8 +139,8 @@ const poll = () => {
   setTimeout(async () => {
     await _.each(Object.keys(ptys), async (k) => {
       await register(k);
-      return poll();
     });
+    return poll();
   }, 5000);
 };
 
